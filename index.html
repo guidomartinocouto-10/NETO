@@ -12,14 +12,13 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        h1 {
-            color: #2c3e50;
-        }
+        h1 { color: #2c3e50; }
         input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             font-size: 16px;
+            box-sizing: border-box;
         }
         button {
             width: 100%;
@@ -29,13 +28,27 @@
             font-size: 16px;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
         }
+        button:hover { background-color: #1a252f; }
         #resultado {
             margin-top: 20px;
             padding: 15px;
             background-color: white;
             border-left: 4px solid #2c3e50;
             display: none;
+        }
+        .fila {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -50,28 +63,54 @@
 
     <div id="resultado">
         <h3>Resultado</h3>
-        <p>Sueldo bruto: <strong id="verBruto"></strong></p>
-        <p>Descuento BPS (18%): <strong id="verBPS"></strong></p>
-        <p>Descuento IRPF: <strong id="verIRPF"></strong></p>
-        <p>Sueldo neto: <strong id="verNeto"></strong></p>
+        <div class="fila"><span>Sueldo bruto</span><strong id="verBruto"></strong></div>
+        <div class="fila"><span>BPS (18%)</span><strong id="verBPS"></strong></div>
+        <div class="fila"><span>IRPF</span><strong id="verIRPF"></strong></div>
+        <div class="fila total"><span>Sueldo neto</span><strong id="verNeto"></strong></div>
     </div>
 
     <script>
-        function calcular() {
-            const bruto = parseFloat(document.getElementById("bruto").value);
-            if (!bruto) return alert("Ingresá tu sueldo bruto");
-
-            const bps = bruto * 0.18;
+        function calcularIRPF(bruto) {
+            // Franjas IRPF Uruguay 2024 (en pesos)
+            const franjas = [
+                { hasta: 22696,  tasa: 0.00 },
+                { hasta: 34044,  tasa: 0.10 },
+                { hasta: 56740,  tasa: 0.15 },
+                { hasta: 113480, tasa: 0.20 },
+                { hasta: 170220, tasa: 0.22 },
+                { hasta: 283700, tasa: 0.25 },
+                { hasta: Infinity, tasa: 0.30 }
+            ];
 
             let irpf = 0;
-            if (bruto > 40000) irpf = (bruto - 40000) * 0.10;
+            let anterior = 0;
 
+            for (const franja of franjas) {
+                if (bruto <= anterior) break;
+                const gravado = Math.min(bruto, franja.hasta) - anterior;
+                irpf += gravado * franja.tasa;
+                anterior = franja.hasta;
+            }
+
+            return irpf;
+        }
+
+        function formatear(n) {
+            return "$" + Math.round(n).toLocaleString("es-UY");
+        }
+
+        function calcular() {
+            const bruto = parseFloat(document.getElementById("bruto").value);
+            if (!bruto || bruto <= 0) return alert("Ingresá un sueldo válido");
+
+            const bps = bruto * 0.18;
+            const irpf = calcularIRPF(bruto - bps);
             const neto = bruto - bps - irpf;
 
-            document.getElementById("verBruto").textContent = "$" + bruto.toFixed(0);
-            document.getElementById("verBPS").textContent = "$" + bps.toFixed(0);
-            document.getElementById("verIRPF").textContent = "$" + irpf.toFixed(0);
-            document.getElementById("verNeto").textContent = "$" + neto.toFixed(0);
+            document.getElementById("verBruto").textContent = formatear(bruto);
+            document.getElementById("verBPS").textContent = "-" + formatear(bps);
+            document.getElementById("verIRPF").textContent = "-" + formatear(irpf);
+            document.getElementById("verNeto").textContent = formatear(neto);
 
             document.getElementById("resultado").style.display = "block";
         }
