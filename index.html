@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETO - Calculá tu sueldo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-left: 4px solid #2c3e50;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>NETO</h1>
+    <p>Calculá tu sueldo neto en Uruguay</p>
+
+    <label>Sueldo bruto mensual ($)</label>
+    <input type="number" id="bruto" placeholder="Ej: 50000">
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div id="resultado">
+        <h3>Resultado</h3>
+        <p>Sueldo bruto: <strong id="verBruto"></strong></p>
+        <p>Descuento BPS (18%): <strong id="verBPS"></strong></p>
+        <p>Descuento IRPF: <strong id="verIRPF"></strong></p>
+        <p>Sueldo neto: <strong id="verNeto"></strong></p>
+    </div>
+
+    <script>
+        function calcular() {
+            const bruto = parseFloat(document.getElementById("bruto").value);
+            if (!bruto) return alert("Ingresá tu sueldo bruto");
+
+            const bps = bruto * 0.18;
+
+            let irpf = 0;
+            if (bruto > 40000) irpf = (bruto - 40000) * 0.10;
+
+            const neto = bruto - bps - irpf;
+
+            document.getElementById("verBruto").textContent = "$" + bruto.toFixed(0);
+            document.getElementById("verBPS").textContent = "$" + bps.toFixed(0);
+            document.getElementById("verIRPF").textContent = "$" + irpf.toFixed(0);
+            document.getElementById("verNeto").textContent = "$" + neto.toFixed(0);
+
+            document.getElementById("resultado").style.display = "block";
+        }
+    </script>
+</body>
+</html>
