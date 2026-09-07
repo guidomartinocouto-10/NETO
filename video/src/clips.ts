@@ -20,6 +20,7 @@ export const clips = {
   concert: { src: "videos/8_concert.mp4" },
   marketGuy: { src: "videos/9_market_guy.mp4" },
   yard: { src: "videos/10_yard.mp4" },
+  friendsBench: { src: "videos/11_friends_bench.mp4" },
 } as const satisfies Record<string, ClipDef>;
 
 export type ClipKey = keyof typeof clips;
